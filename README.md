@@ -42,6 +42,10 @@ Contributions are welcome! If you'd like to contribute to PHPSchema, please foll
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
 
+## Documentation
+
+[https://github.com/ericjesus/PHPSchema/wiki](https://github.com/ericjesus/PHPSchema/wiki)
+
 ## License
 
 This project is licensed under the Apache License 2.0. 
