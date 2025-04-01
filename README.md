@@ -1,8 +1,8 @@
-# PHPSchema
-
-<p align="center">
+<p align="left">
   <img src="./logo.png" alt="PHPSchema" width="100" height="100">
 </p>
+
+# PHPSchema
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
