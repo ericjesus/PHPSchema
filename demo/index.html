@@ -133,8 +133,8 @@
             <div style="flex:1;">
                 <label for="endpoint">Selecione um schema para validar:</label>
                 <select id="endpoint" class="endpoint-select" style="margin-bottom:0;">
-                    <option value="example-1">Cadastro de Usuário</option>
-                    <option value="example-2">Lista de eventos</option>
+                    <option value="example-1">Cadastro de Produto</option>
+                    <option value="example-2">Cadastro de Produtos</option>
                 </select>
             </div>
             <button type="submit" id="send-request" form="payload-form">Validar Schema</button>
@@ -185,11 +185,59 @@
                     // Atualiza texto do schema-configured
                     function updateSchemaText() {
                         var endpoint = $('#endpoint').val();
+                        var schema1 = {
+                            "category": {
+                                "type": "Enum",
+                                "required": true,
+                                "not_empty": true,
+                                "options": ["SMARTPHONES", "SHOES", "CLOTHES"]
+                            },
+                            "name": {
+                                "type": "String",
+                                "required": true,
+                                "not_empty": true,
+                                "max_length": 20
+                            },
+                            "stock": {
+                                "type": "Int",
+                                "required": true,
+                                "not_empty": true,
+                                "min_value": 1
+                            }
+                        };
+                        var schema2 = {
+                            "products": {
+                                "type": [
+                                    {
+                                        "category": {
+                                            "type": "Enum",
+                                            "required": true,
+                                            "not_empty": true,
+                                            "options": ["SMARTPHONES", "SHOES", "CLOTHES"]
+                                        },
+                                        "name": {
+                                            "type": "String",
+                                            "required": true,
+                                            "not_empty": true,
+                                            "max_length": 20
+                                        },
+                                        "stock": {
+                                            "type": "Int",
+                                            "required": true,
+                                            "not_empty": true,
+                                            "min_value": 1
+                                        }
+                                    }
+                                ],
+                                "required": true,
+                                "not_empty": true
+                            }
+                        };
                         var text = '';
                         if(endpoint === 'example-1') {
-                            text = 'Configuração do schema example-1: exemplo de texto.';
+                            text = JSON.stringify(schema1, null, 2);
                         } else if(endpoint === 'example-2') {
-                            text = 'Configuração do schema example-2: exemplo de texto.';
+                            text = JSON.stringify(schema2, null, 2);
                         }
                         $('#schema-configured').text(text);
                     }
