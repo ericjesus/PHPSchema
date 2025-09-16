@@ -1,0 +1,55 @@
+{
+  "name": "ericjesus/phpschema",
+  "description": "A flexible PHP validation library with multi-language support and comprehensive validation types",
+  "type": "library",
+  "keywords": ["validation", "schema", "php", "multilingual", "cpf", "cnpj", "phone", "uuid"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eric Jesus",
+      "email": "ericjesus@example.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "PHPSchema\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PHPSchema\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": [
+      "@php tests/TestRunner.php"
+    ],
+    "test-verbose": [
+      "@php tests/TestRunner.php --verbose"
+    ],
+    "validate-code": [
+      "@test"
+    ],
+    "ci": [
+      "@validate-code"
+    ]
+  },
+  "scripts-descriptions": {
+    "test": "Run all unit tests",
+    "test-verbose": "Run tests with verbose output",
+    "validate-code": "Run test validation",
+    "ci": "Run CI pipeline checks"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

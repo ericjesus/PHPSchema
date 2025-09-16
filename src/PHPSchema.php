@@ -218,7 +218,7 @@ class PHPSchema
       return empty($rules['required']) || (isset($rules['not_empty']) && $rules['not_empty'] === false);
     }
 
-    private function delegateValidation($value, array $rules, bool $strictMode = true): string|bool
+    private function delegateValidation($value, array $rules, bool $strictMode = true): string|bool|array
     {
       $type = $rules['type'];
       
@@ -229,7 +229,10 @@ class PHPSchema
 
       // If it's a sub-schema (array), delegate to validatorSchema
       if (is_array($type)) {
-        return validatorSchema::handle($value, $rules, [$this, 'validate'], $strictMode, $translator);
+        $validateCallback = function($data, $schema, $strictMode = false) {
+          return $this->validate($data, $schema, $strictMode);
+        };
+        return validatorSchema::handle($value, $rules, $validateCallback, $strictMode, $translator);
       }
 
       // Delegate to specific validators based on type

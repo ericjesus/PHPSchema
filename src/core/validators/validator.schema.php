@@ -4,8 +4,14 @@ class validatorSchema
 {
     public static function handle($value, array $rules, callable $validateCallback, bool $strictMode = true, callable $translator = null): string|array|bool
     {
-        // Decode JSON only if not empty
-        $valueDecode = ($value !== '') ? json_decode(html_entity_decode($value), true) : $value;
+        // Only decode JSON if value is a string
+        if (is_string($value) && $value !== '') {
+            $valueDecode = json_decode(html_entity_decode($value), true);
+            // If decoding failed, use original value
+            $valueDecode = $valueDecode ?? $value;
+        } else {
+            $valueDecode = $value;
+        }
 
         // 1️⃣ Array of schemas
         if (isset($rules['type'][0]) && is_array($rules['type'][0])) {
