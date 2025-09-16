@@ -20,6 +20,17 @@ With PHPSchema, you can define clear validation rules, ensuring that incoming da
 * **Flexibility:** Support for a wide range of data types and the ability to create custom types.
 * **Clean and Organized Code:** Simplify your code and make it easier to maintain.
 
+### Requirements
+
+- PHP 8.0+
+
+## Documentation
+
+- 🚀 [Getting Started](docs/getting-started.md)
+- 🔧 [Configuration](docs/configuration.md)
+- 🎯 [Validation Types](docs/validation-types.md)
+- 💡 [Examples](demo)
+
 ## Detailed Features
 
 * **Data Validation:** Validate data against predefined schemas, with support for complex and custom rules.
@@ -27,10 +38,6 @@ With PHPSchema, you can define clear validation rules, ensuring that incoming da
 * **Data Types:** Support for strings, numbers, booleans, arrays, dates, and more.
 * **Custom Types:** Extend the library with your own data types and validation rules.
 * **Detailed Error Messages:** Get clear information about validation errors, facilitating debugging.
-
-### Requirements
-
-- PHP 8.0+
 
 ## Contributing
 
@@ -41,16 +48,6 @@ Contributions are welcome! If you'd like to contribute to PHPSchema, please foll
 3. Commit your changes (`git commit -am 'Add new feature'`).
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
-
-## Documentation
-
-### Quick Links
-- 🚀 [Getting Started](docs/getting-started.md)
-- 🔧 [Configuration](docs/configuration.md)
-- 🎯 [Validation Types](docs/validation-types.md)
-- 🌐 [Translations](docs/translations.md)
-- 💡 [Examples](demo)
-
 
 ## License
 

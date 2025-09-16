@@ -17,7 +17,15 @@
     "name_full_required": "O nome deve incluir pelo menos um nome e um sobrenome.",
     "enum_invalid": "Opção inválida, '{value}' é inválido.",
     "min_length": "Deve ter mais de {min} caracteres.",
-    "max_length": "Não deve exceder {max} caracteres."
+    "max_length": "Não deve exceder {max} caracteres.",
+    "phone_format": "Deve ser uma string válida para telefone.",
+    "phone_invalid": "Formato de telefone inválido.",
+    "cpf_format": "Deve ser uma string válida para CPF.",
+    "cpf_invalid": "CPF inválido.",
+    "cnpj_format": "Deve ser uma string válida para CNPJ.",
+    "cnpj_invalid": "CNPJ inválido.",
+    "uuid_format": "Deve ser uma string válida para UUID.",
+    "uuid_invalid": "Formato de UUID inválido."
   },
   "common": {
     "required": "É obrigatório.",

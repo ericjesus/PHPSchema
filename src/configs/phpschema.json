@@ -1,6 +1,6 @@
 {
-  "locale": "pt_BR",
-  "schemas-path": "schemas",
-  "input-type": "array",
-  "validation-mode": "collect-all"
+    "locale": "pt_BR",
+    "schemas-path": "schemas",
+    "input-type": "array",
+    "validation-mode": "collect-all"
 }

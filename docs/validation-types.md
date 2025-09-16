@@ -113,6 +113,109 @@ Validates against a predefined list of values.
 ]
 ```
 
+### Phone
+
+Brazilian phone number validation supporting mobile and landline formats.
+
+| Parameter | Type | Description | Required |
+|-----------|------|-------------|----------|
+| `type` | `string` | Must be `"Phone"` | ✅ |
+| `required` | `boolean` | Field is mandatory | ❌ |
+| `not_empty` | `boolean` | Field cannot be empty | ❌ |
+
+**Example:**
+```php
+'phone_number' => [
+    'type' => 'Phone',
+    'required' => true
+]
+```
+
+**Validation Rules:**
+- Supports Brazilian phone formats with or without country code
+- Mobile: 11 digits (11987654321) or with country code (5511987654321)
+- Landline: 10 digits (1134567890) or with country code (551134567890)
+- Formatting characters are ignored during validation
+
+**Valid phones:** `11987654321`, `(11) 98765-4321`, `+55 11 9 8765-4321`
+
+### CPF
+
+Brazilian individual taxpayer registry (CPF) validation.
+
+| Parameter | Type | Description | Required |
+|-----------|------|-------------|----------|
+| `type` | `string` | Must be `"CPF"` | ✅ |
+| `required` | `boolean` | Field is mandatory | ❌ |
+| `not_empty` | `boolean` | Field cannot be empty | ❌ |
+
+**Example:**
+```php
+'taxpayer_id' => [
+    'type' => 'CPF',
+    'required' => true
+]
+```
+
+**Validation Rules:**
+- Must be exactly 11 digits
+- Uses modulo-11 checksum algorithm
+- Rejects known invalid sequences (like 111.111.111-11)
+- Formatting characters are ignored during validation
+
+**Valid CPFs:** `123.456.789-09`, `12345678909`
+
+### CNPJ
+
+Brazilian company registry (CNPJ) validation.
+
+| Parameter | Type | Description | Required |
+|-----------|------|-------------|----------|
+| `type` | `string` | Must be `"CNPJ"` | ✅ |
+| `required` | `boolean` | Field is mandatory | ❌ |
+| `not_empty` | `boolean` | Field cannot be empty | ❌ |
+
+**Example:**
+```php
+'company_id' => [
+    'type' => 'CNPJ',
+    'required' => true
+]
+```
+
+**Validation Rules:**
+- Must be exactly 14 digits
+- Uses weighted checksum algorithm
+- Rejects known invalid sequences
+- Formatting characters are ignored during validation
+
+**Valid CNPJs:** `11.222.333/0001-81`, `11222333000181`
+
+### UUID
+
+Universal Unique Identifier (UUID) version 4 validation.
+
+| Parameter | Type | Description | Required |
+|-----------|------|-------------|----------|
+| `type` | `string` | Must be `"UUID"` | ✅ |
+| `required` | `boolean` | Field is mandatory | ❌ |
+| `not_empty` | `boolean` | Field cannot be empty | ❌ |
+
+**Example:**
+```php
+'unique_id' => [
+    'type' => 'UUID',
+    'required' => true
+]
+```
+
+**Validation Rules:**
+- Must follow UUID v4 format: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
+- Where `y` is 8, 9, A, or B (case-insensitive)
+- Exactly 36 characters including hyphens
+
+**Valid UUIDs:** `550e8400-e29b-41d4-a716-446655440000`, `f47ac10b-58cc-4372-a567-0e02b2c3d479`
+
 ## Numeric Types
 
 ### Integer

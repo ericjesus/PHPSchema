@@ -9,15 +9,23 @@
     "max_length": "Must not exceed {max} characters."
   },
   "text": {
-    "string": "Must be a string.",
-    "email": "Must be a valid email.",
+    "string": "Must be a valid string.",
+    "email": "Must be a valid email address.",
     "url": "Invalid URL format.",
     "name": "Must be a valid name.",
     "name_letters_only": "Name can only contain letters and spaces.",
     "name_full_required": "Name must include at least a first and last name.",
     "enum_invalid": "Invalid option, '{value}' is invalid.",
-    "min_length": "Must be more than {min} characters.",
-    "max_length": "Must not exceed {max} characters."
+    "min_length": "Must be at least {min} characters long.",
+    "max_length": "Must not exceed {max} characters.",
+    "phone_format": "Must be a valid string for phone.",
+    "phone_invalid": "Invalid phone format.",
+    "cpf_format": "Must be a valid string for CPF.",
+    "cpf_invalid": "Invalid CPF.",
+    "cnpj_format": "Must be a valid string for CNPJ.",
+    "cnpj_invalid": "Invalid CNPJ.",
+    "uuid_format": "Must be a valid string for UUID.",
+    "uuid_invalid": "Invalid UUID format."
   },
   "common": {
     "required": "Is required.",

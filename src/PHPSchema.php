@@ -239,6 +239,10 @@ class PHPSchema
         case 'Name':
         case 'Url':
         case 'Enum':
+        case 'Phone':
+        case 'CPF':
+        case 'CNPJ':
+        case 'UUID':
           return validatorText::handle($value, $rules, $translator);
         
         case 'Int':
