@@ -1,6 +1,5 @@
 {
   "locale": "pt_BR",
   "schemas-path": "schemas",
-  "input-type" : "array",
-  "output-type" : "array"
+  "input-type" : "array"
 }

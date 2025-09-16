@@ -70,6 +70,12 @@ class PHPSchema
       foreach ($files as $file) {
         require_once $file;
       }
+
+      // Include validation classes
+      require_once __DIR__ . '/core/validators/validator.text.php';
+      require_once __DIR__ . '/core/validators/validator.number.php';
+      require_once __DIR__ . '/core/validators/validator.common.php';
+      require_once __DIR__ . '/core/validators/validator.schema.php';
     }
 
     private function normalizeInput(array|string $input): array
@@ -98,151 +104,83 @@ class PHPSchema
       $fails = array();
 
       foreach ($schema as $field => $rules) {
+        $value = isset($data[$field]) ? $data[$field] : null;
 
-        if (!isset($data[$field]) && !empty($rules['required'])) {
-          $fails['error'][$field] = "Is required.";
+        // Basic validations: required and not_empty
+        $basicValidation = $this->validateBasicRules($value, $rules, $field);
+        if ($basicValidation !== true) {
+          $fails['error'][$field] = $basicValidation;
           continue;
         }
 
+        // If field doesn't exist and is not required, skip
         if (!isset($data[$field])) {
-          continue; // campo opcional ausente
+          continue; // optional field missing
         }
 
-        $value = isset($data[$field]) ? $data[$field] : null;
-
-        // Se o campo é vazio e não é obrigatório, ignora
-        if ($value === null || $value === '') {
-          if (empty($rules['required']) || (isset($rules['not_empty']) && $rules['not_empty'] === false)) {
-            continue; // pula validação
-          }
+        // If field is empty and allowed to be empty, skip
+        if (($value === null || $value === '') && $this->canSkipValidation($rules)) {
+          continue;
         }
 
-        // Decodifica JSON apenas se não estiver vazio
-        $valueDecode = ($value !== '') ? json_decode(html_entity_decode($value), true) : $value;
-
-        // ===== Detecta se o type é um sub-schema =====
+        // Type validation
         if (isset($rules['type'])) {
-          $subSchema = null;
-
-          // 1️⃣ Array de schemas
-          if (is_array($rules['type']) && isset($rules['type'][0]) && is_array($rules['type'][0])) {
-            $subSchema = $rules['type'][0];
-
-            // Se estiver vazio e not_empty=false, ignora
-            if ($valueDecode === '' && (!isset($rules['not_empty']) || $rules['not_empty'] === false)) {
-              continue;
-            }
-
-            if (!is_array($valueDecode) || array_keys($valueDecode) !== range(0, count($valueDecode) - 1)) {
-              $fails['error'][$field] = "Must be an array of items.";
-            } else {
-              foreach ($valueDecode as $idx => $item) {
-                $res = self::validate($item, $subSchema);
-                if ($res !== true) {
-                  $fails['error'][$field][$idx] = $res['error'];
-                }
-              }
-            }
-            continue;
-          }
-
-          // 2️⃣ Único sub-schema (array associativo)
-          if (is_array($rules['type'])) {
-            $subSchema = $rules['type'];
-
-            if ($valueDecode === '' && (!isset($rules['not_empty']) || $rules['not_empty'] === false)) {
-              continue;
-            }
-
-            if (!is_array($valueDecode)) {
-              $fails['error'][$field] = "Must be an object matching the schema.";
-            } else {
-              $res = self::validate($valueDecode, $subSchema);
-              if ($res !== true) {
-                $fails['error'][$field] = $res['error'];
-              }
-            }
-            continue;
-          }
-        }
-
-        // ===== Validação de tipos simples =====
-        if (isset($rules['not_empty']) && $rules['not_empty'] && empty($value) && $value != 0) {
-          $fails['error'][$field] = "Field cannot be empty";
-        }
-
-        switch ($rules['type']) {
-          case 'Email':
-            if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-              $fails['error'][$field] =  "Must be a valid email.";
-            }
-            break;
-          case 'String':
-            if (!is_string($value)) {
-              $fails['error'][$field] =  "Must be a string.";
-            }
-            break;
-          case 'Int':
-            if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
-              $fails['error'][$field] = "Must be a valid integer.";
-            }
-            break;
-          case 'Name':
-            $nameValidation = validatorText::validadeName($value);
-            if ($nameValidation !== true) {
-              $fails['error'][$field] = $nameValidation;
-            }
-            break;
-          case 'Url':
-            if (!filter_var($value, FILTER_VALIDATE_URL)) {
-              $fails['error'][$field] = "Invalid URL format for '$field'.";
-            }
-            break;
-          case 'Enum':
-            if(!in_array($value, $rules['options'])) {
-              $fails['error'][$field] = "Invalid option, '$value' is invalid.";
-            }
-            break;
-          case 'Bool':
-            if (!is_bool($value) && !in_array($value, [0, 1, "0", "1", "true", "false"], true)) {
-              $fails['error'][$field] = "Must be a valid boolean (true/false or 0/1).";
-            }
-            break;
-          case 'Decimal':
-            if (!is_numeric($value) || !preg_match('/^-?\d+(\.\d+)?$/', (string)$value)) {
-              $fails['error'][$field] = "Must be a valid decimal number.";
-            }
-            break;
-        }
-
-        // ===== Validações adicionais =====
-        if (in_array($rules['type'], ['String', 'Email', 'Name'])) {
-          if (isset($rules['min_length']) && strlen($value) < $rules['min_length']) {
-            $fails['error'][$field] =  "Must exceed {$rules['min_length']} characters.";
-          }
-          if (isset($rules['max_length']) && strlen($value) > $rules['max_length']) {
-            $fails['error'][$field] =  "Must not exceed {$rules['max_length']} characters.";
-          }
-        }
-
-        if ($rules['type'] == 'Int') {
-          if (isset($rules['min_value']) && $value < $rules['min_value']) {
-            $fails['error'][$field] = "Must be at least {$rules['min_value']}.";
-          }
-          if (isset($rules['max_value']) && $value > $rules['max_value']) {
-            $fails['error'][$field] = "Must not exceed {$rules['max_value']}.";
-          }
-
-          $valueStr = (string) $value;
-          if (isset($rules['min_length']) && strlen($valueStr) < $rules['min_length']) {
-            $fails['error'][$field] =  "Must exceed {$rules['min_length']} characters.";
-          }
-          if (isset($rules['max_length']) && strlen($valueStr) > $rules['max_length']) {
-            $fails['error'][$field] =  "Must not exceed {$rules['max_length']} characters.";
+          $validationResult = $this->delegateValidation($value, $rules, $field);
+          if ($validationResult !== true) {
+            $fails['error'][$field] = $validationResult;
           }
         }
       }
 
       return count($fails) > 0 ? $fails : true;
+    }
+
+    private function validateBasicRules($value, array $rules, string $field): string|bool
+    {
+      // Required validation
+      $requiredValidation = validatorCommon::validateRequired($value, !empty($rules['required']));
+      if ($requiredValidation !== true) {
+        return $requiredValidation;
+      }
+
+      // Not empty validation
+      if (isset($rules['not_empty'])) {
+        return validatorCommon::validateNotEmpty($value, $rules['not_empty']);
+      }
+
+      return true;
+    }
+
+    private function canSkipValidation(array $rules): bool
+    {
+      return empty($rules['required']) || (isset($rules['not_empty']) && $rules['not_empty'] === false);
+    }
+
+    private function delegateValidation($value, array $rules, string $field): string|bool
+    {
+      $type = $rules['type'];
+
+      // If it's a sub-schema (array), delegate to validatorSchema
+      if (is_array($type)) {
+        return validatorSchema::handle($value, $rules, $field, [$this, 'validate']);
+      }
+
+      // Delegate to specific validators based on type
+      switch ($type) {
+        case 'String':
+        case 'Email':
+        case 'Name':
+        case 'Url':
+        case 'Enum':
+          return validatorText::handle($value, $rules, $field);
+        
+        case 'Int':
+        case 'Decimal':
+        case 'Bool':
+          return validatorNumber::handle($value, $rules, $field);
+        
+        default:
+          throw new InvalidArgumentException("Invalid type: $type");
+      }
     }
 }
