@@ -2,21 +2,21 @@
 
 class validatorSchema
 {
-    public static function handle($value, array $rules, string $field, callable $validateCallback): string|array|bool
+    public static function handle($value, array $rules, string $field, callable $validateCallback, bool $strictMode = true): string|array|bool
     {
         // Decode JSON only if not empty
         $valueDecode = ($value !== '') ? json_decode(html_entity_decode($value), true) : $value;
 
         // 1️⃣ Array of schemas
         if (isset($rules['type'][0]) && is_array($rules['type'][0])) {
-            return self::validateArraySchema($valueDecode, $rules, $validateCallback);
+            return self::validateArraySchema($valueDecode, $rules, $validateCallback, $strictMode);
         }
 
         // 2️⃣ Single sub-schema (associative array)
-        return self::validateObjectSchema($valueDecode, $rules, $validateCallback);
+        return self::validateObjectSchema($valueDecode, $rules, $validateCallback, $strictMode);
     }
 
-    private static function validateArraySchema($valueDecode, array $rules, callable $validateCallback): string|array|bool
+    private static function validateArraySchema($valueDecode, array $rules, callable $validateCallback, bool $strictMode): string|array|bool
     {
         $subSchema = $rules['type'][0];
 
@@ -31,7 +31,7 @@ class validatorSchema
 
         $errors = [];
         foreach ($valueDecode as $idx => $item) {
-            $res = $validateCallback($item, $subSchema);
+            $res = $validateCallback($item, $subSchema, $strictMode);
             if ($res !== true) {
                 $errors[$idx] = $res['error'];
             }
@@ -40,7 +40,7 @@ class validatorSchema
         return count($errors) > 0 ? $errors : true;
     }
 
-    private static function validateObjectSchema($valueDecode, array $rules, callable $validateCallback): string|array|bool
+    private static function validateObjectSchema($valueDecode, array $rules, callable $validateCallback, bool $strictMode): string|array|bool
     {
         if ($valueDecode === '' && (!isset($rules['not_empty']) || $rules['not_empty'] === false)) {
             return true;
@@ -50,7 +50,7 @@ class validatorSchema
             return "Must be an object matching the schema.";
         }
 
-        $res = $validateCallback($valueDecode, $rules['type']);
+        $res = $validateCallback($valueDecode, $rules['type'], $strictMode);
         return $res !== true ? $res['error'] : true;
     }
 }

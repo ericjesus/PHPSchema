@@ -14,11 +14,11 @@ class PHPSchema
       $this->importSchemasFromPath($this->config['schemas-path']);
     }
 
-    public function check(array|string $input, array $schema): bool|array
+    public function check(array|string $input, array $schema, bool $strictMode = false): bool|array
     {
       $data = $this->normalizeInput($input);
 
-      return $this->validate($data, $schema);
+      return $this->validate($data, $schema, $strictMode);
     }
 
     private function getConfig(): array
@@ -99,9 +99,25 @@ class PHPSchema
       }
     }
 
-    private function validate(array $data, array $schema) : bool|array
+    private function validate(array $data, array $schema, bool $strictMode = true) : bool|array
     {
       $fails = array();
+      $validationMode = $this->config['validation-mode'] ?? 'fail-fast';
+
+      // Strict mode validation: check for extra fields not defined in schema
+      if ($strictMode) {
+        $extraFields = array_diff(array_keys($data), array_keys($schema));
+        if (!empty($extraFields)) {
+          foreach ($extraFields as $extraField) {
+            $fails['error'][$extraField] = "Field is not allowed in strict mode.";
+            
+            // Fail-fast mode: return immediately on first error
+            if ($validationMode === 'fail-fast') {
+              return $fails;
+            }
+          }
+        }
+      }
 
       foreach ($schema as $field => $rules) {
         $value = isset($data[$field]) ? $data[$field] : null;
@@ -110,6 +126,11 @@ class PHPSchema
         $basicValidation = $this->validateBasicRules($value, $rules, $field);
         if ($basicValidation !== true) {
           $fails['error'][$field] = $basicValidation;
+          
+          // Fail-fast mode: return immediately on first error
+          if ($validationMode === 'fail-fast') {
+            return $fails;
+          }
           continue;
         }
 
@@ -125,9 +146,14 @@ class PHPSchema
 
         // Type validation
         if (isset($rules['type'])) {
-          $validationResult = $this->delegateValidation($value, $rules, $field);
+          $validationResult = $this->delegateValidation($value, $rules, $field, $strictMode);
           if ($validationResult !== true) {
             $fails['error'][$field] = $validationResult;
+            
+            // Fail-fast mode: return immediately on first error
+            if ($validationMode === 'fail-fast') {
+              return $fails;
+            }
           }
         }
       }
@@ -156,13 +182,13 @@ class PHPSchema
       return empty($rules['required']) || (isset($rules['not_empty']) && $rules['not_empty'] === false);
     }
 
-    private function delegateValidation($value, array $rules, string $field): string|bool
+    private function delegateValidation($value, array $rules, string $field, bool $strictMode = true): string|bool
     {
       $type = $rules['type'];
 
       // If it's a sub-schema (array), delegate to validatorSchema
       if (is_array($type)) {
-        return validatorSchema::handle($value, $rules, $field, [$this, 'validate']);
+        return validatorSchema::handle($value, $rules, $field, [$this, 'validate'], $strictMode);
       }
 
       // Delegate to specific validators based on type
