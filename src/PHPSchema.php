@@ -83,12 +83,6 @@ class PHPSchema
       foreach ($files as $file) {
         require_once $file;
       }
-
-      // Include validation classes
-      require_once __DIR__ . '/core/validators/validator.text.php';
-      require_once __DIR__ . '/core/validators/validator.number.php';
-      require_once __DIR__ . '/core/validators/validator.common.php';
-      require_once __DIR__ . '/core/validators/validator.schema.php';
     }
 
     private function importValidators(): void
