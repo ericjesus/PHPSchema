@@ -1,1 +1,42 @@
-{}
+{
+  "number": {
+    "integer": "Must be a valid integer.",
+    "decimal": "Must be a valid decimal number.",
+    "boolean": "Must be a valid boolean value (true/false or 0/1).",
+    "min_value": "Must be at least {min}.",
+    "max_value": "Must not exceed {max}.",
+    "min_length": "Must be more than {min} characters.",
+    "max_length": "Must not exceed {max} characters."
+  },
+  "text": {
+    "string": "Must be a string.",
+    "email": "Must be a valid email.",
+    "url": "Invalid URL format.",
+    "name": "Must be a valid name.",
+    "name_letters_only": "Name can only contain letters and spaces.",
+    "name_full_required": "Name must include at least a first and last name.",
+    "enum_invalid": "Invalid option, '{value}' is invalid.",
+    "min_length": "Must be more than {min} characters.",
+    "max_length": "Must not exceed {max} characters."
+  },
+  "common": {
+    "required": "Is required.",
+    "not_empty": "Field cannot be empty.",
+    "strict_mode": "Field is not allowed in strict mode."
+  },
+  "schema": {
+    "array_required": "Must be an array of items.",
+    "object_required": "Must be an object that matches the schema."
+  },
+  "phpschema": {
+    "config_not_found": "Configuration file not found: {file}",
+    "config_invalid_format": "Invalid configuration file format: {file}",
+    "translation_not_found": "Translation file not found: {file}",
+    "translation_invalid_format": "Invalid translation file format: {file}",
+    "input_not_array": "Input is not an array: {type}",
+    "input_not_json": "Input is not a valid JSON array: {type}",
+    "input_invalid_type": "Invalid input type: {type}",
+    "schemas_path_invalid": "Invalid schemas path: {path}",
+    "type_invalid": "Invalid type: {type}"
+  }
+}

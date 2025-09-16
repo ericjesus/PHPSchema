@@ -3,6 +3,7 @@
 class PHPSchema
 {
     private array $config;
+    private array $schemas;
     private array $translations;
 
     public function __construct()
@@ -57,6 +58,17 @@ class PHPSchema
       return $translations;
     }
 
+    public function translate(string $category, string $key, array $placeholders = []): string
+    {
+        $message = $this->translations[$category][$key] ?? $key;
+        
+        foreach ($placeholders as $placeholder => $value) {
+            $message = str_replace('{' . $placeholder . '}', $value, $message);
+        }
+        
+        return $message;
+    }
+
     private function importSchemasFromPath(string $path): void
     {
       $path = dirname(__DIR__, 1) . '/' . $path;
@@ -103,20 +115,23 @@ class PHPSchema
     {
       $fails = array();
       $validationMode = $this->config['validation-mode'] ?? 'fail-fast';
+      
+      // Create translator function
+      $translator = function(string $category, string $key, array $placeholders = []) {
+          return $this->translate($category, $key, $placeholders);
+      };
 
-      // Strict mode validation: check for extra fields not defined in schema
-      if ($strictMode) {
-        $extraFields = array_diff(array_keys($data), array_keys($schema));
-        if (!empty($extraFields)) {
-          foreach ($extraFields as $extraField) {
-            $fails['error'][$extraField] = "Field is not allowed in strict mode.";
-            
-            // Fail-fast mode: return immediately on first error
-            if ($validationMode === 'fail-fast') {
-              return $fails;
-            }
+      // Strict mode validation: moved to validatorCommon
+      $strictErrors = validatorCommon::validateStrictMode($data, $schema, $strictMode, $translator);
+      if (!empty($strictErrors)) {
+          foreach ($strictErrors as $field => $error) {
+              $fails['error'][$field] = $error;
+              
+              // Fail-fast mode: return immediately on first error
+              if ($validationMode === 'fail-fast') {
+                  return $fails;
+              }
           }
-        }
       }
 
       foreach ($schema as $field => $rules) {
@@ -163,15 +178,20 @@ class PHPSchema
 
     private function validateBasicRules($value, array $rules, string $field): string|bool
     {
+      // Create translator function
+      $translator = function(string $category, string $key, array $placeholders = []) {
+          return $this->translate($category, $key, $placeholders);
+      };
+      
       // Required validation
-      $requiredValidation = validatorCommon::validateRequired($value, !empty($rules['required']));
+      $requiredValidation = validatorCommon::validateRequired($value, !empty($rules['required']), $translator);
       if ($requiredValidation !== true) {
         return $requiredValidation;
       }
 
       // Not empty validation
       if (isset($rules['not_empty'])) {
-        return validatorCommon::validateNotEmpty($value, $rules['not_empty']);
+        return validatorCommon::validateNotEmpty($value, $rules['not_empty'], $translator);
       }
 
       return true;
@@ -185,10 +205,15 @@ class PHPSchema
     private function delegateValidation($value, array $rules, string $field, bool $strictMode = true): string|bool
     {
       $type = $rules['type'];
+      
+      // Create translator function
+      $translator = function(string $category, string $key, array $placeholders = []) {
+          return $this->translate($category, $key, $placeholders);
+      };
 
       // If it's a sub-schema (array), delegate to validatorSchema
       if (is_array($type)) {
-        return validatorSchema::handle($value, $rules, $field, [$this, 'validate'], $strictMode);
+        return validatorSchema::handle($value, $rules, [$this, 'validate'], $strictMode, $translator);
       }
 
       // Delegate to specific validators based on type
@@ -198,15 +223,15 @@ class PHPSchema
         case 'Name':
         case 'Url':
         case 'Enum':
-          return validatorText::handle($value, $rules, $field);
+          return validatorText::handle($value, $rules, $translator);
         
         case 'Int':
         case 'Decimal':
         case 'Bool':
-          return validatorNumber::handle($value, $rules, $field);
+          return validatorNumber::handle($value, $rules, $translator);
         
         default:
-          throw new InvalidArgumentException("Invalid type: $type");
+          throw new InvalidArgumentException($this->translate('phpschema', 'type_invalid', ['type' => $type]));
       }
     }
 }

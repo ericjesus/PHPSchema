@@ -1,1 +1,42 @@
-{}
+{
+  "number": {
+    "integer": "Debe ser un número entero válido.",
+    "decimal": "Debe ser un número decimal válido.",
+    "boolean": "Debe ser un valor booleano válido (true/false o 0/1).",
+    "min_value": "Debe ser al menos {min}.",
+    "max_value": "No debe exceder {max}.",
+    "min_length": "Debe tener más de {min} caracteres.",
+    "max_length": "No debe exceder {max} caracteres."
+  },
+  "text": {
+    "string": "Debe ser una cadena de texto.",
+    "email": "Debe ser un email válido.",
+    "url": "Formato de URL inválido.",
+    "name": "Debe ser un nombre válido.",
+    "name_letters_only": "El nombre solo puede contener letras y espacios.",
+    "name_full_required": "El nombre debe incluir al menos un nombre y un apellido.",
+    "enum_invalid": "Opción inválida, '{value}' es inválido.",
+    "min_length": "Debe tener más de {min} caracteres.",
+    "max_length": "No debe exceder {max} caracteres."
+  },
+  "common": {
+    "required": "Es obligatorio.",
+    "not_empty": "El campo no puede estar vacío.",
+    "strict_mode": "Campo no permitido en modo estricto."
+  },
+  "schema": {
+    "array_required": "Debe ser un array de elementos.",
+    "object_required": "Debe ser un objeto que coincida con el esquema."
+  },
+  "phpschema": {
+    "config_not_found": "Archivo de configuración no encontrado: {file}",
+    "config_invalid_format": "Formato inválido del archivo de configuración: {file}",
+    "translation_not_found": "Archivo de traducción no encontrado: {file}",
+    "translation_invalid_format": "Formato inválido del archivo de traducción: {file}",
+    "input_not_array": "La entrada no es un array: {type}",
+    "input_not_json": "La entrada no es un JSON array válido: {type}",
+    "input_invalid_type": "Tipo de entrada inválido: {type}",
+    "schemas_path_invalid": "Ruta de esquemas inválida: {path}",
+    "type_invalid": "Tipo inválido: {type}"
+  }
+}
