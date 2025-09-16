@@ -44,7 +44,13 @@ Contributions are welcome! If you'd like to contribute to PHPSchema, please foll
 
 ## Documentation
 
-[https://github.com/ericjesus/PHPSchema/wiki](https://github.com/ericjesus/PHPSchema/wiki)
+### Quick Links
+- 🚀 [Getting Started](docs/getting-started.md)
+- 🔧 [Configuration](docs/configuration.md)
+- 🎯 [Validation Types](docs/validation-types.md)
+- 🌐 [Translations](docs/translations.md)
+- 💡 [Examples](demo)
+
 
 ## License
 

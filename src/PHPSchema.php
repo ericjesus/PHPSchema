@@ -3,7 +3,6 @@
 class PHPSchema
 {
     private array $config;
-    private array $schemas;
     private array $translations;
 
     public function __construct()
@@ -13,6 +12,8 @@ class PHPSchema
       $this->translations = $this->getTranslations($this->config['locale']);
 
       $this->importSchemasFromPath($this->config['schemas-path']);
+
+      $this->importValidators();
     }
 
     public function check(array|string $input, array $schema, bool $strictMode = false): bool|array
@@ -90,6 +91,21 @@ class PHPSchema
       require_once __DIR__ . '/core/validators/validator.schema.php';
     }
 
+    private function importValidators(): void
+    {
+      $path = dirname(__DIR__, 1) . '/src/core/validators';
+
+      if (!is_dir($path)) {
+        throw new InvalidArgumentException("Invalid validators path: $path");
+      }
+
+      $files = glob($path . '/*.php');
+
+      foreach ($files as $file) {
+        require_once $file;
+      }
+    }
+
     private function normalizeInput(array|string $input): array
     {
       $inputType = $this->config['input-type'];
@@ -161,7 +177,7 @@ class PHPSchema
 
         // Type validation
         if (isset($rules['type'])) {
-          $validationResult = $this->delegateValidation($value, $rules, $field, $strictMode);
+          $validationResult = $this->delegateValidation($value, $rules, $strictMode);
           if ($validationResult !== true) {
             $fails['error'][$field] = $validationResult;
             
@@ -202,7 +218,7 @@ class PHPSchema
       return empty($rules['required']) || (isset($rules['not_empty']) && $rules['not_empty'] === false);
     }
 
-    private function delegateValidation($value, array $rules, string $field, bool $strictMode = true): string|bool
+    private function delegateValidation($value, array $rules, bool $strictMode = true): string|bool
     {
       $type = $rules['type'];
       

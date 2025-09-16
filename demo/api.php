@@ -10,11 +10,11 @@ $PHPSchema = new PHPSchema();
 
 if($_POST['endpoint'] == 'example-1')
 {
-    $validation = $PHPSchema->check($_POST, SchemaSample::Product, false);
+    $validation = $PHPSchema->check($_POST, SchemaSample::Product);
 }
 else if($_POST['endpoint'] == 'example-2')
 {
-    $validation = $PHPSchema->check($_POST, SchemaSample::Products, false);
+    $validation = $PHPSchema->check($_POST, SchemaSample::Products);
 }
 
 echo json_encode($validation, true);
